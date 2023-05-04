@@ -1,5 +1,6 @@
 package com.example.p_jdbcrestapi_couchbase_mvc.controller;
 
+import com.couchbase.client.java.json.JsonObject;
 import com.example.p_jdbcrestapi_couchbase_mvc.model.*;
 import com.example.p_jdbcrestapi_couchbase_mvc.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,8 @@ import java.util.Set;
 public class ITStoreController {
     ProductsRepository productsRepository;
     CustomerEmployeeSupplierRepository customerEmployeeSupplierRepository;
-    /*CharacteristicRepository characteristicRepository;
-
     InvoiceRepository invoiceRepository;
+    /*CharacteristicRepository characteristicRepository;
     ItemRepository itemRepository;
     List<String> source;
 
@@ -36,9 +36,10 @@ public class ITStoreController {
         return productsRepository.findAll();
     }*/
 
-    public ITStoreController(ProductsRepository productsRepository, CustomerEmployeeSupplierRepository customerEmployeeSupplierRepository) {
+    public ITStoreController(ProductsRepository productsRepository, CustomerEmployeeSupplierRepository customerEmployeeSupplierRepository, InvoiceRepository invoiceRepository) {
         this.productsRepository = productsRepository;
         this.customerEmployeeSupplierRepository = customerEmployeeSupplierRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     @GetMapping("/first_N_products")
@@ -84,14 +85,14 @@ public class ITStoreController {
     /*@GetMapping("/invoices")
     public Iterable<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
-    }
+    }*/
 
     @GetMapping("/max_invoice")
     public Float getMaxInvoice() {
         return invoiceRepository.findMaxValue();
     }
 
-    @GetMapping("/month_with_greatest_sale")
+    /*@GetMapping("/month_with_greatest_sale")
     public Iterable<InvoiceRepository.MonthSale> getMonthWithGreatestSale() {
         return invoiceRepository.getMonthWithGreatestSales();
     }
