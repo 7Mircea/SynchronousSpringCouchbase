@@ -15,8 +15,9 @@ import java.util.Set;
 @RequestMapping("/itStore")
 public class ITStoreController {
     ProductsRepository productsRepository;
-    /*CharacteristicRepository characteristicRepository;
     CustomerEmployeeSupplierRepository customerEmployeeSupplierRepository;
+    /*CharacteristicRepository characteristicRepository;
+
     InvoiceRepository invoiceRepository;
     ItemRepository itemRepository;
     List<String> source;
@@ -35,8 +36,9 @@ public class ITStoreController {
         return productsRepository.findAll();
     }*/
 
-    public ITStoreController(ProductsRepository productsRepository) {
+    public ITStoreController(ProductsRepository productsRepository, CustomerEmployeeSupplierRepository customerEmployeeSupplierRepository) {
         this.productsRepository = productsRepository;
+        this.customerEmployeeSupplierRepository = customerEmployeeSupplierRepository;
     }
 
     @GetMapping("/first_N_products")
@@ -72,14 +74,14 @@ public class ITStoreController {
     @GetMapping("/employee")
     public Iterable<String> getEmployeeWithGreatestNrOfInvoices() {
         return customerEmployeeSupplierRepository.findEmployeeWithGreatestNrOfInvoices();
-    }
+    }*/
 
     @GetMapping("/ces_by_type")
-    public Iterable<Customer_Employee_Supplier_Table> getCustomerEmployeeSupplierByTypeCES(@RequestParam(name = "type", required = true) char type) {
+    public Iterable<Customer_Employee_Supplier> getCustomerEmployeeSupplierByTypeCES(@RequestParam(name = "type", required = true) char type) {
         return customerEmployeeSupplierRepository.findCustomerEmployeeSupplierByTypeCES(type);
     }
 
-    @GetMapping("/invoices")
+    /*@GetMapping("/invoices")
     public Iterable<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }

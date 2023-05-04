@@ -78,7 +78,7 @@ public class ProductsRepository {
     private Bucket bucket;
     private Scope scope;
     private Collection collection;
-    private  String COLLECTION_NAME = "products";
+    private String COLLECTION_NAME = "products";
 
     public ProductsRepository(Cluster cluster, Bucket bucket, Scope scope) {
         this.cluster = cluster;
@@ -97,7 +97,7 @@ public class ProductsRepository {
     }
 
     public Iterable<Products> findProductsByIdProdIsBefore(int n) {
-        String query = "select "+COLLECTION_NAME+".* from "+COLLECTION_NAME;
+        String query = "select " + COLLECTION_NAME + ".* from " + COLLECTION_NAME + " where " + COLLECTION_NAME + ".id_prod < " + n;
         try {
             QueryResult result = scope.query(query);
             return result.rowsAs(Products.class);
