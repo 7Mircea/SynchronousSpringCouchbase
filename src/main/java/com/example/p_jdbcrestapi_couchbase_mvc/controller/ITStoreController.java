@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+
 @RestController
 @RequestMapping("/itStore")
 public class ITStoreController {
@@ -38,23 +41,32 @@ public class ITStoreController {
         return productsRepository.findProductsByIdProdIsBefore(N);
     }
 
-    /*@GetMapping("/product_max_profit")
+    /**
+     * Complex Q4
+     * @return
+     */
+    @GetMapping("/product_max_profit")
     public Iterable<ProductsRepository.CategoryProductProfit> getProductWithMaxProfit() {
         return productsRepository.findProductWithGreatestProfitInCategory();
     }
 
+    /**
+     * Complex Q5
+     * @return
+     */
     @GetMapping("/category_profit")
     public Iterable<ProductsRepository.CategoryProfit> getCategoryProfit() {
         return productsRepository.findProfitForEachCategory();
     }
 
-    @GetMapping("/characteristics")
+    /*@GetMapping("/characteristics")
     public Iterable<Characteristic> getAllCharacteristics() {
         return characteristicRepository.findAll();
     }*/
 
     /**
      * Simple Query 2
+     *
      * @param productId
      * @return
      */
@@ -75,6 +87,7 @@ public class ITStoreController {
 
     /**
      * Simple Query 1
+     *
      * @param type
      * @return
      */
@@ -90,6 +103,7 @@ public class ITStoreController {
 
     /**
      * Simple Query 3
+     *
      * @return
      */
     @GetMapping("/max_invoice")
@@ -100,18 +114,26 @@ public class ITStoreController {
     /*@GetMapping("/month_with_greatest_sale")
     public Iterable<InvoiceRepository.MonthSale> getMonthWithGreatestSale() {
         return invoiceRepository.getMonthWithGreatestSales();
-    }
+    }*/
 
+    /**
+     * Complex Q1
+     * @return
+     */
     @GetMapping("/sales_cost")
-    public Set<InvoiceRepository.SalesCostMonthYear> getSalesCost() {
+    public List<InvoiceRepository.SalesCostMonthYear> getSalesCost() {
         return invoiceRepository.findSalesCostMonthYear();
     }
 
+    /**
+     * Complex Q3
+     * @return
+     */
     @GetMapping("/profit_on_each_product")
-    public Set<InvoiceRepository.ProfitOnEachProduct> getProfitOnEachProduct() {
+    public List<InvoiceRepository.ProfitOnEachProduct> getProfitOnEachProduct() {
         return invoiceRepository.findProfitOnEachProduct();
     }
-
+/*
     @GetMapping("/items")
     public Iterable<Item> getAllItems() {
         return itemRepository.findAll();
@@ -119,6 +141,7 @@ public class ITStoreController {
 
     /**
      * Simple Query 4
+     *
      * @return
      */
     @GetMapping("/items_between_dates")

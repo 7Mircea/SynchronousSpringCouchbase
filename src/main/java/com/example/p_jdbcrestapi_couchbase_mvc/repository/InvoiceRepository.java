@@ -19,42 +19,14 @@ import java.util.List;
 @Repository
 public class InvoiceRepository{// extends JpaRepository<Invoice, InvoiceId> {
     /*@Query(value = "select max(value) from invoice;",nativeQuery = true)
-    public Float findMaxValue();
+    public Float findMaxValue();*/
 
-    @Query(value="select S.sales sales, Ch.costs costs,S.month month_,S.year year_\n" +
-            "from (select SUM(value) as sales,\n" +
-            "        EXTRACT(month from invoice_date) as month,\n" +
-            "        EXTRACT(year from invoice_date) as year \n" +
-            "        from invoice \n" +
-            "        where type='c'\n" +
-            "        group by EXTRACT(month from invoice_date),EXTRACT(year from invoice_date)) S\n" +
-            "    full join (select SUM(value) as costs,\n" +
-            "        EXTRACT(month from invoice_date) as month,\n" +
-            "        EXTRACT(year from invoice_date) as year\n" +
-            "        from invoice \n" +
-            "        where type='s'\n" +
-            "        group by EXTRACT(month from invoice_date), EXTRACT(year from invoice_date)) Ch\n" +
-            "    on S.month = Ch.month and S.year=Ch.year\n" +
-            "    order by S.year, S.month;",nativeQuery = true)
-    public Set<SalesCostMonthYear> findSalesCostMonthYear();
 
-    @Query(value="select S.prod_name, (S.sales - C.costs) Profit\n" +
-            "from (select p.prod_name prod_name, sum(i.quantity * i.unit_price) sales\n" +
-            "    from item i inner join products p on i.id_prod = p.id_prod\n" +
-            "        inner join invoice inv on inv.nr = i.invoice_nr and inv.invoice_date = i.invoice_date\n" +
-            "        where inv.type = 'c'\n" +
-            "        group by i.id_prod,p.prod_name) S \n" +
-            "    inner join \n" +
-            "    (select p.prod_name prod_name, sum(i.quantity * i.unit_price) costs\n" +
-            "    from item i inner join products p on i.id_prod = p.id_prod\n" +
-            "        inner join invoice inv on inv.nr = i.invoice_nr and inv.invoice_date = i.invoice_date\n" +
-            "        where inv.type = 's'\n" +
-            "        group by i.id_prod,p.prod_name) C \n" +
-            "    on S.prod_name = C.prod_name \n" +
-            "order by S.prod_name;",nativeQuery = true)
-    public Set<ProfitOnEachProduct> findProfitOnEachProduct();
 
-    @Query(value = "select S.month, S.sales \n" +
+
+
+
+    /*@Query(value = "select S.month, S.sales \n" +
             "from (select SUM(value) as sales,\n" +
             "            EXTRACT(month from invoice_date) as month,\n" +
             "            EXTRACT(year from invoice_date) as year\n" +
@@ -71,17 +43,9 @@ public class InvoiceRepository{// extends JpaRepository<Invoice, InvoiceId> {
             "where S2.month is null;",nativeQuery = true)
     Set<MonthSale> getMonthWithGreatestSales();
 
-    interface SalesCostMonthYear {
-        float getSales();
-        float getCosts();
-        int getMonth_();
-        int getYear_();
-    }
 
-    interface ProfitOnEachProduct {
-        String getProd_Name();
-        float getProfit();
-    }
+
+
 
     interface MonthSale {
         String getMonth();
@@ -112,11 +76,84 @@ public class InvoiceRepository{// extends JpaRepository<Invoice, InvoiceId> {
         }
     }
 
+    public List<SalesCostMonthYear> findSalesCostMonthYear() {
+        String query =  "select S.sales as sales, Ch.costs as costs, S.month as month_, S.year as year_ from \n" +
+                "(select SUM(value_) as sales,\n" +
+                "DATE_PART_STR(invoice_date,'month') as month,\n" +
+                "DATE_PART_STR(invoice_date,'year') as year \n" +
+                "from invoice \n" +
+                "where type='c'\n" +
+                "group by DATE_PART_STR(invoice_date,'month'), DATE_PART_STR(invoice_date,'year')) as S\n" +
+                "join\n" +
+                "(select SUM(value_) as costs,\n" +
+                "DATE_PART_STR(invoice_date,'month') as month,\n" +
+                "DATE_PART_STR(invoice_date,'year') as year \n" +
+                "from invoice \n" +
+                "where type='s'\n" +
+                "group by DATE_PART_STR(invoice_date,'month'),DATE_PART_STR(invoice_date,'year')) as Ch\n" +
+                "on S.month = Ch.month and S.year=Ch.year\n" +
+                " order by S.year, S.month;";
+        try {
+            QueryResult result = scope.query(query);
+            return result.rowsAs(SalesCostMonthYear.class);
+        } catch (DocumentNotFoundException ex) {
+            throw new RepositoryException(" unable to find max value in invoice" , ex);
+        }
+    }
+
+    /**
+     * Complex Q3
+     * @return
+     */
+    public List<ProfitOnEachProduct> findProfitOnEachProduct() {
+        String query =  "select S.prod_name, (S.sales - C.costs) profit from \n" +
+                "(select p.prod_name as prod_name, sum(i.quantity * i.unit_price) as sales\n" +
+                "from item as i inner join products as p on i.id_prod = p.id_prod\n" +
+                "inner join invoice inv on inv.nr = i.invoice_nr and inv.invoice_date = i.invoice_date\n" +
+                "where inv.type = 'c'\n" +
+                "group by i.id_prod,p.prod_name) as S\n" +
+                "inner join\n" +
+                "(select p.prod_name as prod_name, sum(i.quantity * i.unit_price) as costs\n" +
+                "from item as i inner join products as p on i.id_prod = p.id_prod\n" +
+                "inner join invoice inv on inv.nr = i.invoice_nr and inv.invoice_date = i.invoice_date\n" +
+                "where inv.type = 's'\n" +
+                "group by i.id_prod,p.prod_name) as C\n" +
+                "on S.prod_name = C.prod_name\n" +
+                "order by S.prod_name;";
+        try {
+            QueryResult result = scope.query(query);
+            return result.rowsAs(ProfitOnEachProduct.class);
+        } catch (DocumentNotFoundException ex) {
+            throw new RepositoryException(" unable to find max value in invoice" , ex);
+        }
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     private static class FloatWrapper {
         private Float v;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SalesCostMonthYear {
+        private float sales;
+        private float costs;
+        private int year_;
+        private int month_;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProfitOnEachProduct {
+
+        private float profit;
+        private String prod_name;
     }
 }
