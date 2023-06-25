@@ -62,7 +62,7 @@ public class ProductsRepository {
                 "            inner join invoice f on f.nr = i.invoice_nr and f.invoice_date = i.invoice_date  \n" +
                 "            where f.type = 's' and p.category = SS.category  \n" +
                 "            group by i.id_prod,p.prod_name) as C\n" +
-                " on S.prod_name = C.prod_name group by S.category)";
+                "            on S.prod_name = C.prod_name group by S.category)";
         try {
             QueryResult result = scope.query(query);
             return result.rowsAs(CategoryProductProfit.class);
@@ -71,6 +71,10 @@ public class ProductsRepository {
         }
     }
 
+    /**
+     * Complex Q5
+     * @return profit for each category of products
+     */
     public List<CategoryProfit> findProfitForEachCategory() {
         String query = "select S.category as category, sum(S.sales - C.costs) as profit  \n" +
                 "              from (select p.category as category, p.prod_name as prod_name, sum(i.quantity * i.unit_price) as sales  \n" +

@@ -20,7 +20,7 @@ public class Config {
     public Cluster cluster(@Value("${couchbase.clusterHost}") String hostname, @Value("${couchbase.username}") String username,
                            @Value("${couchbase.password}") String password) {
         ClusterEnvironment.Builder environmentBuilder = ClusterEnvironment.builder();
-        environmentBuilder.timeoutConfig().queryTimeout(Duration.ofMinutes(6)).build();
+        environmentBuilder.timeoutConfig().queryTimeout(Duration.ofMinutes(20)).build();
         ClusterOptions options = ClusterOptions.clusterOptions(username,password).environment(environmentBuilder.build());
         return Cluster.connect(hostname,options);
     }
